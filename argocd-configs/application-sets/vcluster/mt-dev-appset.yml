@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: host-ns-generator
+  namespace: argocd
+spec:
+  generators:
+  - matrix:
+      generators:
+        - list:
+            elements:
+            - server: https://kubernetes.svc.cluster.local
+              name: gke-mt-dev
+        - git:
+            repoURL: https://github.com/Aamir-raza-1/tenancy
+            revision: HEAD
+            directories:
+            - path: cluster-apps/gke-mt/vcluster/dev
+  template:
+    metadata:
+      name: '{{path.[1]}}-{{name}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/Aamir-raza-1/tenancy
+        targetRevision: HEAD
+        path: '{{path}}'
+      destination:
+        server: '{{server}}'
+      syncPolicy:
+        automated: 
+          prune: true
+  syncPolicy:
+    # Don't delete Application's child resources, on parent deletion:
+    preserveResourcesOnDeletion: false

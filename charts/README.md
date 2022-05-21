@@ -1,1 +1,1 @@
-# This folder contains charts
+# Directory contains charts
